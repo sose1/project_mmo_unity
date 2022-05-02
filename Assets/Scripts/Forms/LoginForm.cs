@@ -40,10 +40,10 @@ public class LoginForm : MonoBehaviour
         else
         {
             Debug.Log("StatusCode: " + request.responseCode + "\nBody: " + request.downloadHandler.text);
-            if (request.responseCode == 200)
-            {
-                PlayerPrefs.SetString("AuthTokenAPI", request.downloadHandler.text);
-            }
+            if (request.responseCode != 200) yield break;
+            
+            PlayerPrefs.SetString("AuthTokenAPI", request.downloadHandler.text);
+            SceneManager.LoadScene("GameScene");
         }
     }
 }
