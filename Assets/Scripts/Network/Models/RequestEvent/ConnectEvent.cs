@@ -5,11 +5,11 @@ namespace Network.Models.RequestEvent
     [Serializable]
     public class ConnectEvent : NetworkEvent
     {
-        public Data data;
+        public ConnectData data;
     }
 
     [Serializable]
-    public class Data
+    public class ConnectData
     {
         public string jwtApi;
     }

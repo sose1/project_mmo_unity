@@ -4,19 +4,23 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Network.Models.Other;
 using Network.Models.RequestEvent;
 using Network.Models.ResponseEvent;
 using UnityEngine;
-using Data = Network.Models.RequestEvent.Data;
 
 namespace Network
 {
     public class NetworkController : MonoBehaviour
     {
+        public GameObject playerObject;
+
         private UdpClient _udpClient;
         private Rect _windowRect;
         private bool _isLoading = true;
-        private bool _isConnected = false;
+        private bool _isConnected;
+        private string _userId;
+        
         private void Start()
         {
             var x = (Screen.width - 400) / 2;
@@ -26,20 +30,27 @@ namespace Network
             try
             {
                 _udpClient.Connect("127.0.0.1", 5500);
-
+                _udpClient.Client.ReceiveTimeout = 1000;
             }
             catch (Exception e)
             {
                 Debug.LogError(e.Message);
             }
+            StartCoroutine(OnReceive());
+            StartCoroutine(SendEvent(GetConnectEventMessage()));
+        }
 
-            SendConnectEvent();
+        private void Update()
+        {
+            if (!_isConnected) return;
+            SendUserMoveEvent(playerObject.transform.position);
         }
 
         private void OnDestroy()
         {
             PlayerPrefs.DeleteAll();
             StopAllCoroutines();
+            _udpClient.Close();
         }
 
         private void OnGUI()
@@ -55,10 +66,10 @@ namespace Network
             var jwtApi = PlayerPrefs.GetString("AuthTokenAPI");
             var message = Encoding.ASCII.GetBytes(
                 JsonUtility.ToJson(
-                    new ConnectEvent()
+                    new ConnectEvent
                     {
                         name = "connect",
-                        data = new Data()
+                        data = new ConnectData
                         {
                             jwtApi = "Bearer " + jwtApi
                         }
@@ -67,30 +78,83 @@ namespace Network
             );
             return message;
         }
-
-        private void SendConnectEvent()
+        
+        private void SendUserMoveEvent(Vector3 transformPosition)
         {
-            StartCoroutine(SendEvent(GetConnectEventMessage(), message =>
-            {
-                var connectedEvent = JsonUtility.FromJson<ConnectedEvent>(message);
-                PlayerPrefs.SetString("AuthTokenServer", connectedEvent.data.jwtServer);
-                Thread.Sleep(2000);
-                _isLoading = false;
-                _isConnected = true;
-                StopCoroutine(nameof(SendEvent));
-            }));
+            var message = Encoding.ASCII.GetBytes(
+                JsonUtility.ToJson(
+                    new UserMoveEvent
+                    {
+                        name = "user-move",
+                        data = new UserMoveData
+                        {
+                            authorization = "Bearer " + PlayerPrefs.GetString("AuthTokenServer"),
+                            userId = _userId,
+                            position = new Position
+                            {
+                                x = transformPosition.x,
+                                y = transformPosition.y,
+                                z = transformPosition.z
+                            }
+                        }
+                    }
+                )
+            );
+
+            StartCoroutine(SendEvent(message));
+            StopCoroutine(nameof(SendEvent));
         }
 
-        private IEnumerator SendEvent(byte[] message, Action<string> onMessageReceived)
+        private IEnumerator SendEvent(byte[] message)
         {
-            var remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
             yield return _udpClient.Send(message, message.Length);
+        }
 
-            var receiveBytes = _udpClient.Receive(ref remoteEndPoint);
-            var receiveString = Encoding.ASCII.GetString(receiveBytes);
+        private IEnumerator OnReceive()
+        {
+            while (true)
+            {
+                try
+                {
+                    if (_udpClient.Available > 0)
+                    {
+                        var remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
 
-            onMessageReceived(receiveString);
-            yield return null;
+                        var receiveBytes = _udpClient.Receive(ref remoteEndPoint);
+                        var receiveString = Encoding.ASCII.GetString(receiveBytes);
+                            
+                        if (receiveString.Contains("connected"))
+                            OnConnected(receiveString);
+                        else if (receiveString.Contains("other-user-move"))
+                            OnOtherPlayerMove(receiveString);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                    throw;
+                }
+
+                yield return null;
+            }
+        }
+
+        private void OnConnected(string message)
+        {
+            var connectedEvent = JsonUtility.FromJson<ConnectedEvent>(message);
+            PlayerPrefs.SetString("AuthTokenServer", connectedEvent.data.jwtServer);
+            Thread.Sleep(2000);
+            _userId = connectedEvent.data.user._id;
+            _isLoading = false;
+            _isConnected = true;
+            StopCoroutine(nameof(SendEvent));
+        }
+
+        private  void OnOtherPlayerMove(string message)
+        {
+            var otherUserMoveEvent = JsonUtility.FromJson<OtherUserMoveEvent>(message);
+            var position = otherUserMoveEvent.data.position;
+            //todo Zmiana pozycji gracza szukanie po ID;
         }
     }
 }

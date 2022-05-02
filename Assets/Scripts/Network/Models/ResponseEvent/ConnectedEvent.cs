@@ -5,12 +5,12 @@ namespace Network.Models.ResponseEvent
     [Serializable]
     public class ConnectedEvent : NetworkEvent
     {
-        public Data data;
+        public ConnectedData data;
 
     }
 
     [Serializable]
-    public class Data
+    public class ConnectedData
     {
         public string jwtServer;
         public User user;
