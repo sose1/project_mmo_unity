@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Network.Models.Other;
 
 namespace Network.Models.ResponseEvent
 {
@@ -12,6 +13,6 @@ namespace Network.Models.ResponseEvent
     [Serializable]
     public class UserDisconnectedData
     {
-        public List<Other.User> users;
+        public List<User> users;
     }
 }
