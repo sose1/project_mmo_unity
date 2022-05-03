@@ -17,16 +17,16 @@ namespace Network
         private const string IP = "127.0.0.1";
         private const int SERVER_PORT = 5500;
         private const int CLIENT_PORT = 5600;
-        
+
         public TMP_Text networkStatus;
-        
+        public GameObject playerPrefab;
+
         private UdpClient _udpClient;
         private Rect _windowRect;
         private bool _isLoading = true;
         private bool _isConnected;
         private string _userId;
-
-        private Vector3 lastPosition;
+        
         private void Start()
         {
             var x = (Screen.width - 400) / 2;
@@ -42,28 +42,31 @@ namespace Network
             {
                 Debug.LogError(e.Message);
             }
+
             StartCoroutine(PingUpdate());
             StartCoroutine(OnReceive());
             StartCoroutine(SendEvent(GetConnectEventMessage()));
         }
-        
+
 
         public void OnLocalPlayerMove(Vector3 position)
         {
             if (!_isConnected) return;
-                SendUserMoveEvent(position);
+            SendUserMoveEvent(position);
         }
+
         private void OnApplicationQuit()
         {
             SendDisconnectEvent();
         }
-        
+
         private void OnDestroy()
         {
             PlayerPrefs.DeleteAll();
             StopAllCoroutines();
             _udpClient.Close();
         }
+
         private void OnGUI()
         {
             if (_isLoading)
@@ -108,11 +111,11 @@ namespace Network
                     }
                 )
             );
-            
+
             StartCoroutine(SendEvent(message));
             StopCoroutine(nameof(SendEvent));
         }
-        
+
         private void SendUserMoveEvent(Vector3 transformPosition)
         {
             var message = Encoding.ASCII.GetBytes(
@@ -174,7 +177,7 @@ namespace Network
                         if (receiveString.Contains("other-user-move"))
                             OnOtherPlayerMove(receiveString);
                         if (receiveString.Contains("user-disconnected"))
-                            OnUserDisconnected(receiveString); 
+                            OnUserDisconnected(receiveString);
                     }
                 }
                 catch (Exception e)
@@ -195,15 +198,21 @@ namespace Network
             _userId = connectedEvent.data.user._id;
             _isLoading = false;
             _isConnected = true;
+            var lastPosition = connectedEvent.data.user.position;
+            if (lastPosition != null)
+                Instantiate(
+                    playerPrefab,
+                    new Vector3(lastPosition.x, lastPosition.y, lastPosition.z),
+                    Quaternion.identity
+                );
             StopCoroutine(nameof(SendEvent));
         }
 
         private void OnUserDisconnected(string message)
         {
-            Debug.LogError("Tu coś się dzieje xD");
             var userDisconnected = JsonUtility.FromJson<UserDisconnectedEvent>(message);
-            Debug.LogError(userDisconnected.data.users[0]._id);
         }
+
         private void OnOtherPlayerMove(string message)
         {
             var otherUserMoveEvent = JsonUtility.FromJson<OtherUserMoveEvent>(message);

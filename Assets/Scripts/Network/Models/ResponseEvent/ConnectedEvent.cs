@@ -1,4 +1,5 @@
 ﻿using System;
+using Network.Models.Other;
 
 namespace Network.Models.ResponseEvent
 {
@@ -14,13 +15,5 @@ namespace Network.Models.ResponseEvent
     {
         public string jwtServer;
         public User user;
-    }
-
-    [Serializable]
-    public class User
-    {
-        public string _id;
-        public string email;
-        public string password;
     }
 }
