@@ -7,35 +7,43 @@ using System.Threading;
 using Network.Models.Other;
 using Network.Models.RequestEvent;
 using Network.Models.ResponseEvent;
+using TMPro;
 using UnityEngine;
 
 namespace Network
 {
     public class NetworkController : MonoBehaviour
     {
+        private const string IP = "127.0.0.1";
+        private const int SERVER_PORT = 5500;
+        private const int CLIENT_PORT = 5600;
+        
         public GameObject playerObject;
-
+        public TMP_Text networkStatus;
+        
         private UdpClient _udpClient;
         private Rect _windowRect;
         private bool _isLoading = true;
         private bool _isConnected;
         private string _userId;
+
         
         private void Start()
         {
             var x = (Screen.width - 400) / 2;
             var y = (Screen.height - 120) / 2;
             _windowRect = new Rect(x, y, 400, 120);
-            _udpClient = new UdpClient(5600);
+            _udpClient = new UdpClient(CLIENT_PORT);
             try
             {
-                _udpClient.Connect("127.0.0.1", 5500);
+                _udpClient.Connect(IP, SERVER_PORT);
                 _udpClient.Client.ReceiveTimeout = 1000;
             }
             catch (Exception e)
             {
                 Debug.LogError(e.Message);
             }
+            StartCoroutine(PingUpdate());
             StartCoroutine(OnReceive());
             StartCoroutine(SendEvent(GetConnectEventMessage()));
         }
@@ -78,7 +86,7 @@ namespace Network
             );
             return message;
         }
-        
+
         private void SendUserMoveEvent(Vector3 transformPosition)
         {
             var message = Encoding.ASCII.GetBytes(
@@ -105,6 +113,18 @@ namespace Network
             StopCoroutine(nameof(SendEvent));
         }
 
+        private IEnumerator PingUpdate()
+        {
+            RestartLoop:
+
+            var ping = new Ping(IP);
+            yield return new WaitForSeconds(1f);
+            while (!ping.isDone) yield return null;
+
+            networkStatus.text = $"SERVER: {ping.ip}, PING: {ping.time} ms";
+            goto RestartLoop;
+        }
+
         private IEnumerator SendEvent(byte[] message)
         {
             yield return _udpClient.Send(message, message.Length);
@@ -122,7 +142,7 @@ namespace Network
 
                         var receiveBytes = _udpClient.Receive(ref remoteEndPoint);
                         var receiveString = Encoding.ASCII.GetString(receiveBytes);
-                            
+
                         if (receiveString.Contains("connected"))
                             OnConnected(receiveString);
                         else if (receiveString.Contains("other-user-move"))
@@ -150,7 +170,7 @@ namespace Network
             StopCoroutine(nameof(SendEvent));
         }
 
-        private  void OnOtherPlayerMove(string message)
+        private void OnOtherPlayerMove(string message)
         {
             var otherUserMoveEvent = JsonUtility.FromJson<OtherUserMoveEvent>(message);
             var position = otherUserMoveEvent.data.position;
