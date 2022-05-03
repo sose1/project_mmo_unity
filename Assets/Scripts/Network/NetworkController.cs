@@ -54,13 +54,17 @@ namespace Network
             SendUserMoveEvent(playerObject.transform.position);
         }
 
+        private void OnApplicationQuit()
+        {
+            SendDisconnectEvent();
+        }
+        
         private void OnDestroy()
         {
             PlayerPrefs.DeleteAll();
             StopAllCoroutines();
             _udpClient.Close();
         }
-
         private void OnGUI()
         {
             if (_isLoading)
@@ -87,6 +91,29 @@ namespace Network
             return message;
         }
 
+        private void SendDisconnectEvent()
+        {
+            var jwtApi = "Bearer " + PlayerPrefs.GetString("AuthTokenAPI");
+            var jwtServer = "Bearer " + PlayerPrefs.GetString("AuthTokenServer");
+            var message = Encoding.ASCII.GetBytes(
+                JsonUtility.ToJson(
+                    new DisconnectEvent
+                    {
+                        name = "disconnect",
+                        data = new DisconnectData
+                        {
+                            authorization = jwtServer,
+                            jwtApi = jwtApi,
+                            userId = _userId
+                        }
+                    }
+                )
+            );
+            
+            StartCoroutine(SendEvent(message));
+            StopCoroutine(nameof(SendEvent));
+        }
+        
         private void SendUserMoveEvent(Vector3 transformPosition)
         {
             var message = Encoding.ASCII.GetBytes(
@@ -145,8 +172,10 @@ namespace Network
 
                         if (receiveString.Contains("connected"))
                             OnConnected(receiveString);
-                        else if (receiveString.Contains("other-user-move"))
+                        if (receiveString.Contains("other-user-move"))
                             OnOtherPlayerMove(receiveString);
+                        if (receiveString.Contains("user-disconnected"))
+                            OnUserDisconnected(receiveString); 
                     }
                 }
                 catch (Exception e)
@@ -170,6 +199,12 @@ namespace Network
             StopCoroutine(nameof(SendEvent));
         }
 
+        private void OnUserDisconnected(string message)
+        {
+            Debug.LogError("Tu coś się dzieje xD");
+            var userDisconnected = JsonUtility.FromJson<UserDisconnectedEvent>(message);
+            Debug.LogError(userDisconnected.data.users[0]._id);
+        }
         private void OnOtherPlayerMove(string message)
         {
             var otherUserMoveEvent = JsonUtility.FromJson<OtherUserMoveEvent>(message);
