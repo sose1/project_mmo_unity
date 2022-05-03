@@ -50,7 +50,6 @@ namespace Network
 
         public void OnLocalPlayerMove(Vector3 position)
         {
-            Debug.LogError("Zmieniona pozycja");
             if (!_isConnected) return;
                 SendUserMoveEvent(position);
         }
