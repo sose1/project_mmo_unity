@@ -18,7 +18,6 @@ namespace Network
         private const int SERVER_PORT = 5500;
         private const int CLIENT_PORT = 5600;
         
-        public GameObject playerObject;
         public TMP_Text networkStatus;
         
         private UdpClient _udpClient;
@@ -27,7 +26,7 @@ namespace Network
         private bool _isConnected;
         private string _userId;
 
-        
+        private Vector3 lastPosition;
         private void Start()
         {
             var x = (Screen.width - 400) / 2;
@@ -47,13 +46,14 @@ namespace Network
             StartCoroutine(OnReceive());
             StartCoroutine(SendEvent(GetConnectEventMessage()));
         }
+        
 
-        private void Update()
+        public void OnLocalPlayerMove(Vector3 position)
         {
+            Debug.LogError("Zmieniona pozycja");
             if (!_isConnected) return;
-            SendUserMoveEvent(playerObject.transform.position);
+                SendUserMoveEvent(position);
         }
-
         private void OnApplicationQuit()
         {
             SendDisconnectEvent();
