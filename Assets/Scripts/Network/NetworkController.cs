@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Characters;
 using Network.Models.Other;
 using Network.Models.RequestEvent;
 using Network.Models.ResponseEvent;
@@ -174,11 +175,13 @@ namespace Network
                         var receiveBytes = _udpClient.Receive(ref remoteEndPoint);
                         var receiveString = Encoding.ASCII.GetString(receiveBytes);
 
-                        if (receiveString.Contains("connected"))
+                        if (receiveString.Contains("user-connected"))
+                            OnUserConnected(receiveString);
+                        else if (receiveString.Contains("connected"))
                             OnConnected(receiveString);
-                        if (receiveString.Contains("other-user-move"))
+                        else if (receiveString.Contains("other-user-move"))
                             OnOtherPlayerMove(receiveString);
-                        if (receiveString.Contains("user-disconnected"))
+                        else if (receiveString.Contains("user-disconnected"))
                             OnUserDisconnected(receiveString);
                     }
                 }
@@ -192,6 +195,7 @@ namespace Network
             }
         }
 
+
         private void OnConnected(string message)
         {
             var connectedEvent = JsonUtility.FromJson<ConnectedEvent>(message);
@@ -200,32 +204,37 @@ namespace Network
             _userId = connectedEvent.data.user._id;
             _isLoading = false;
             _isConnected = true;
-            var lastPosition = connectedEvent.data.user.position;
-            Instantiate(
-                localPlayerPrefab,
-                lastPosition != null
-                    ? new Vector3(lastPosition.x, lastPosition.y, lastPosition.z)
-                    : new Vector3(0, 0, 0),
-                Quaternion.identity
-            );
 
-            ;
+            //Generate local player
+            var lastPosition = connectedEvent.data.user.position;
+            CreateLocalPlayer(lastPosition);
+
+            //Generate RemotePlayer
             var remotePlayers = connectedEvent.data.otherUsers;
             if (remotePlayers != null && remotePlayers.Count > 0)
             {
                 foreach (var player in remotePlayers)
                 {
-                    if (player._id == _userId) return;
-                    Instantiate(
-                        remotePlayerPrefab,
-                        player.position != null
-                            ? new Vector3(player.position.x, player.position.y, player.position.z)
-                            : new Vector3(0, 0, 0),
-                        Quaternion.identity
-                    ).GetComponent<RemotePlayerController>().id = player._id;
+                    if (player._id != _userId)
+                    {
+                        Debug.Log("W IF: " + player._id);
+                        CreateRemotePlayer(player.position, player._id);
+                    }
                 }
             }
-            StopCoroutine(nameof(SendEvent));
+        }
+
+    
+        private void OnUserConnected(string receiveString)
+        {
+            var userConnectedEvent = JsonUtility.FromJson<UserConnectedEvent>(receiveString);
+            var lastPosition = userConnectedEvent.data.user.position;
+
+            if (userConnectedEvent.data.user._id != _userId)
+            {
+                Debug.Log("W IF: " + userConnectedEvent.data.user._id);
+                CreateRemotePlayer(lastPosition, userConnectedEvent.data.user._id);
+            }
         }
 
         private void OnUserDisconnected(string message)
@@ -239,6 +248,28 @@ namespace Network
             var otherUserMoveEvent = JsonUtility.FromJson<OtherUserMoveEvent>(message);
             var position = otherUserMoveEvent.data.position;
             //todo Zmiana pozycji gracza szukanie po ID;
+        }
+        
+        private void CreateLocalPlayer(Position position)
+        {
+            Instantiate(
+                localPlayerPrefab,
+                position != null
+                    ? new Vector3(position.x, position.y, position.z)
+                    : new Vector3(0, 0, 0),
+                Quaternion.identity
+            ).GetComponent<LocalPlayerController>().id = _userId;
+        }
+        
+        private void CreateRemotePlayer(Position position, string id)
+        {
+            Instantiate(
+                remotePlayerPrefab,
+                position != null
+                    ? new Vector3(position.x, position.y, position.z)
+                    : new Vector3(0, 0, 0),
+                Quaternion.identity
+            ).GetComponent<RemotePlayerController>().id = id;
         }
     }
 }
