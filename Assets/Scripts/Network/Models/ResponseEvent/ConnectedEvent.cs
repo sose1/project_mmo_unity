@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using JetBrains.Annotations;
 using Network.Models.Other;
 
 namespace Network.Models.ResponseEvent
@@ -15,5 +17,6 @@ namespace Network.Models.ResponseEvent
     {
         public string jwtServer;
         public User user;
+        [CanBeNull] public List<User> otherUsers;
     }
 }

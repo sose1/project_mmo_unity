@@ -13,6 +13,6 @@ namespace Network.Models.ResponseEvent
     [Serializable]
     public class UserDisconnectedData
     {
-        public List<User> users;
+        public User user;
     }
 }

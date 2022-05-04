@@ -205,12 +205,14 @@ namespace Network
                     new Vector3(lastPosition.x, lastPosition.y, lastPosition.z),
                     Quaternion.identity
                 );
+            //Todo Generate Remote Player
             StopCoroutine(nameof(SendEvent));
         }
 
         private void OnUserDisconnected(string message)
         {
             var userDisconnected = JsonUtility.FromJson<UserDisconnectedEvent>(message);
+            Debug.LogError(userDisconnected.data.user.email);
         }
 
         private void OnOtherPlayerMove(string message)
