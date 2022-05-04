@@ -10,13 +10,14 @@ namespace Characters
         public CharacterController characterController;
 
         public float speed = 5f;
-
+        public string id;
         private GameObject _networkControllerGameObject;
         private NetworkController _networkController;
         private Vector3 _lastPosition;
 
         private void Start()
         {
+            Debug.Log("TWorze gracza o ID: " + id);
             _networkControllerGameObject = GameObject.Find("NetworkController");
             _networkController = _networkControllerGameObject.GetComponent<NetworkController>();
         }
