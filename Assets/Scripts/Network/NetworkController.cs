@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -19,14 +20,15 @@ namespace Network
         private const int CLIENT_PORT = 5600;
 
         public TMP_Text networkStatus;
-        public GameObject playerPrefab;
+        public GameObject localPlayerPrefab;
+        public GameObject remotePlayerPrefab;
 
         private UdpClient _udpClient;
         private Rect _windowRect;
         private bool _isLoading = true;
         private bool _isConnected;
         private string _userId;
-        
+
         private void Start()
         {
             var x = (Screen.width - 400) / 2;
@@ -199,13 +201,30 @@ namespace Network
             _isLoading = false;
             _isConnected = true;
             var lastPosition = connectedEvent.data.user.position;
-            if (lastPosition != null)
-                Instantiate(
-                    playerPrefab,
-                    new Vector3(lastPosition.x, lastPosition.y, lastPosition.z),
-                    Quaternion.identity
-                );
-            //Todo Generate Remote Player
+            Instantiate(
+                localPlayerPrefab,
+                lastPosition != null
+                    ? new Vector3(lastPosition.x, lastPosition.y, lastPosition.z)
+                    : new Vector3(0, 0, 0),
+                Quaternion.identity
+            );
+
+            ;
+            var remotePlayers = connectedEvent.data.otherUsers;
+            if (remotePlayers != null && remotePlayers.Count > 0)
+            {
+                foreach (var player in remotePlayers)
+                {
+                    if (player._id == _userId) return;
+                    Instantiate(
+                        remotePlayerPrefab,
+                        player.position != null
+                            ? new Vector3(player.position.x, player.position.y, player.position.z)
+                            : new Vector3(0, 0, 0),
+                        Quaternion.identity
+                    ).GetComponent<RemotePlayerController>().id = player._id;
+                }
+            }
             StopCoroutine(nameof(SendEvent));
         }
 
