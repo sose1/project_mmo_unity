@@ -1,17 +1,24 @@
+using System;
 using UnityEngine;
 
 public class RemotePlayerController : MonoBehaviour
 {
-    public string id;
-    // Start is called before the first frame update
+    private Vector3 _lastPosition;
+    private Vector3 _endPosition;
+    public Vector3 velocity = Vector3.zero;
     void Start()
     {
-        Debug.LogError("WYGENEROWANO z ID " + id);
+        _lastPosition = transform.position;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate()
     {
-        
+        transform.position = Vector3.SmoothDamp(_lastPosition, _endPosition, ref velocity, 0.5f * Time.smoothDeltaTime);
+    }
+
+    public void Move(Vector3 position)
+    {
+        _endPosition = position;
+        _lastPosition = transform.position;
     }
 }

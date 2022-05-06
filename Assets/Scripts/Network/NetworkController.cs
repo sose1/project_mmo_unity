@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -12,13 +11,13 @@ using Network.Models.ResponseEvent;
 using TMPro;
 using UnityEngine;
 
-namespace Network
+namespace Network 
 {
     public class NetworkController : MonoBehaviour
     {
         private const string IP = "127.0.0.1";
         private const int SERVER_PORT = 5500;
-        private const int CLIENT_PORT = 5600;
+        private const int CLIENT_PORT = 5602;
 
         public TMP_Text networkStatus;
         public GameObject localPlayerPrefab;
@@ -50,7 +49,6 @@ namespace Network
             StartCoroutine(OnReceive());
             StartCoroutine(SendEvent(GetConnectEventMessage()));
         }
-
 
         public void OnLocalPlayerMove(Vector3 position)
         {
@@ -173,22 +171,22 @@ namespace Network
                         var remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
 
                         var receiveBytes = _udpClient.Receive(ref remoteEndPoint);
-                        var receiveString = Encoding.ASCII.GetString(receiveBytes);
+                        var receiveString = Encoding.UTF8.GetString(receiveBytes);
 
-                        if (receiveString.Contains("user-connected"))
+                        if (receiveString.Contains("user-disconnected"))
+                            OnUserDisconnected(receiveString);
+                        else if (receiveString.Contains("user-connected"))
                             OnUserConnected(receiveString);
                         else if (receiveString.Contains("connected"))
                             OnConnected(receiveString);
                         else if (receiveString.Contains("other-user-move"))
                             OnOtherPlayerMove(receiveString);
-                        else if (receiveString.Contains("user-disconnected"))
-                            OnUserDisconnected(receiveString);
+
                     }
                 }
                 catch (Exception e)
                 {
                     Debug.LogError(e);
-                    throw;
                 }
 
                 yield return null;
@@ -217,14 +215,13 @@ namespace Network
                 {
                     if (player._id != _userId)
                     {
-                        Debug.Log("W IF: " + player._id);
                         CreateRemotePlayer(player.position, player._id);
                     }
                 }
             }
         }
 
-    
+
         private void OnUserConnected(string receiveString)
         {
             var userConnectedEvent = JsonUtility.FromJson<UserConnectedEvent>(receiveString);
@@ -232,7 +229,6 @@ namespace Network
 
             if (userConnectedEvent.data.user._id != _userId)
             {
-                Debug.Log("W IF: " + userConnectedEvent.data.user._id);
                 CreateRemotePlayer(lastPosition, userConnectedEvent.data.user._id);
             }
         }
@@ -241,15 +237,17 @@ namespace Network
         {
             var userDisconnected = JsonUtility.FromJson<UserDisconnectedEvent>(message);
             Debug.LogError(userDisconnected.data.user.email);
+            //Todo iusuwanie gracza
         }
 
         private void OnOtherPlayerMove(string message)
         {
             var otherUserMoveEvent = JsonUtility.FromJson<OtherUserMoveEvent>(message);
             var position = otherUserMoveEvent.data.position;
-            //todo Zmiana pozycji gracza szukanie po ID;
+            var vector = new Vector3(position.x, position.y, position.z);
+            GameObject.Find(otherUserMoveEvent.data.userId).GetComponent<RemotePlayerController>().Move(vector);
         }
-        
+
         private void CreateLocalPlayer(Position position)
         {
             Instantiate(
@@ -260,7 +258,7 @@ namespace Network
                 Quaternion.identity
             ).GetComponent<LocalPlayerController>().id = _userId;
         }
-        
+
         private void CreateRemotePlayer(Position position, string id)
         {
             Instantiate(
@@ -269,7 +267,7 @@ namespace Network
                     ? new Vector3(position.x, position.y, position.z)
                     : new Vector3(0, 0, 0),
                 Quaternion.identity
-            ).GetComponent<RemotePlayerController>().id = id;
+            ).name = id;
         }
     }
 }
