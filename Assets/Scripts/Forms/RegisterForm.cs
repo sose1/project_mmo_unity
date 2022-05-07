@@ -33,7 +33,7 @@ public class RegisterForm : MonoBehaviour
         var request = WebRequestBuilder.GetInstance().Request("http://127.0.0.1:8080/api/v1/users", "POST", requestRaw);
         yield return request.SendWebRequest();
 
-        if (request.isNetworkError)
+        if (request.error != null)
         {
             Debug.Log("Error While Sending: " + request.error);
         }

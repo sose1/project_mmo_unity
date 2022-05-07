@@ -160,7 +160,6 @@ namespace Network
 
         private IEnumerator SendEvent(byte[] message)
         {
-            Debug.Log(Encoding.UTF8.GetString(message));
             yield return _udpClient.Send(message, message.Length);
         }
 
