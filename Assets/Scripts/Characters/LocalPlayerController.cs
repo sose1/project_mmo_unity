@@ -1,4 +1,5 @@
 using System;
+using Cinemachine;
 using Network;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -22,6 +23,7 @@ namespace Characters
             Debug.Log("TWorze gracza o ID: " + id);
             _networkControllerGameObject = GameObject.Find("NetworkController");
             _networkController = _networkControllerGameObject.GetComponent<NetworkController>();
+            FindObjectOfType<CinemachineFreeLook>().GetComponent<FollowPlayer>().Follow();
         }
 
         private void FixedUpdate()
@@ -32,7 +34,7 @@ namespace Characters
 
             var position = transform.position;
             _lastPosition = position;
-     
+
             if (_sendTimer.Equals(1f))
             {
                 _networkController.OnLocalPlayerMove(position);
