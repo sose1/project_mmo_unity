@@ -10,10 +10,11 @@ public class RegisterForm : MonoBehaviour
 {
     public TMP_InputField emailInput;
     public TMP_InputField passwordInput;
+    public TMP_InputField nicknameInput;
 
     public void onClickSubmit()
     {
-        StartCoroutine(RegisterUser(emailInput.text, passwordInput.text));
+        StartCoroutine(RegisterUser(emailInput.text, passwordInput.text, nicknameInput.text));
     }
 
     public void onClickBack()
@@ -22,12 +23,12 @@ public class RegisterForm : MonoBehaviour
 
     }
 
-    private static IEnumerator RegisterUser(string email, string password)
+    private static IEnumerator RegisterUser(string email, string password, string nickname)
     {
         var requestRaw =
             Encoding.UTF8.GetBytes(
                 JsonUtility.ToJson(
-                    new RegisterRequestModel {email = email, password = password}
+                    new RegisterRequestModel {email = email, password = password, nickname = nickname}
                 )
             );
         var request = WebRequestBuilder.GetInstance().Request("http://127.0.0.1:8080/api/v1/users", "POST", requestRaw);
@@ -49,4 +50,5 @@ public class RegisterRequestModel
 {
     public string email;
     public string password;
+    public string nickname;
 }

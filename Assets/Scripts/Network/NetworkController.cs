@@ -5,11 +5,13 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using Characters;
+using Cinemachine;
 using Network.Models.Other;
 using Network.Models.RequestEvent;
 using Network.Models.ResponseEvent;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Network 
 {
@@ -218,7 +220,7 @@ namespace Network
                 {
                     if (player._id != _userId)
                     {
-                        CreateRemotePlayer(player.position, player._id);
+                        CreateRemotePlayer(player.position, player);
                     }
                 }
             }
@@ -232,7 +234,7 @@ namespace Network
 
             if (userConnectedEvent.data.user._id != _userId)
             {
-                CreateRemotePlayer(lastPosition, userConnectedEvent.data.user._id);
+                CreateRemotePlayer(lastPosition, userConnectedEvent.data.user);
             }
         }
 
@@ -262,7 +264,7 @@ namespace Network
             ).GetComponent<LocalPlayerController>().id = _userId;
         }
 
-        private void CreateRemotePlayer(Position position, string id)
+        private void CreateRemotePlayer(Position position, User remoteUser)
         {
             Instantiate(
                 remotePlayerPrefab,
@@ -270,7 +272,14 @@ namespace Network
                     ? new Vector3(position.x, position.y, position.z)
                     : new Vector3(0, 0, 0),
                 Quaternion.identity
-            ).name = id;
+            ).name = remoteUser._id;
+            GameObject.Find(remoteUser._id).GetComponentInChildren<TextMeshPro>().text = remoteUser.nickname;
+
+            var cameraRotation = FindObjectOfType<CinemachineFreeLook>().transform.position;
+            var textRotation = Quaternion.Euler(cameraRotation.x, 0, cameraRotation.z);
+            GameObject.Find(remoteUser._id)
+                .GetComponentInChildren<TextMeshPro>()
+                .transform.rotation = textRotation;
         }
     }
 }

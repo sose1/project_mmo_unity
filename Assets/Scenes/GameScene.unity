@@ -360,8 +360,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 501037867}
-  m_LocalRotation: {x: -0.20024486, y: 0.5770229, z: 0.1485668, w: 0.7777367}
-  m_LocalPosition: {x: -901.7105, y: -480.91266, z: -253.44228}
+  m_LocalRotation: {x: -0.2001626, y: 0.57816845, z: 0.14897452, w: 0.7768287}
+  m_LocalPosition: {x: -901.7105, y: -480.91266, z: -250.44228}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -466,7 +466,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 549961642}
-  m_LocalRotation: {x: -0.47107732, y: 0.5883658, z: -0.09409186, w: 0.6504296}
+  m_LocalRotation: {x: -0.47066844, y: 0.58957875, z: -0.094175115, w: 0.64961463}
   m_LocalPosition: {x: -901.7105, y: -526.33844, z: 167.91689}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -539,7 +539,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 620893590}
-  m_LocalRotation: {x: -0.4943933, y: 0.5913953, z: -0.07265742, w: 0.6328885}
+  m_LocalRotation: {x: -0.49395508, y: 0.59261054, z: -0.07269658, w: 0.6320889}
   m_LocalPosition: {x: -901.7105, y: -526.33844, z: 167.91689}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1356,7 +1356,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1389395568}
   m_LocalRotation: {x: 0.38268343, y: 0, z: 0, w: 0.92387956}
-  m_LocalPosition: {x: 0, y: 10, z: 0}
+  m_LocalPosition: {x: 0, y: 10, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 549961644}
@@ -1735,7 +1735,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1840371296}
-  m_LocalRotation: {x: -0.48262906, y: 0.58995366, z: -0.08355927, w: 0.6419048}
+  m_LocalRotation: {x: -0.48220563, y: 0.59116805, z: -0.083620965, w: 0.6410973}
   m_LocalPosition: {x: -901.7105, y: -526.33844, z: 167.91689}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
