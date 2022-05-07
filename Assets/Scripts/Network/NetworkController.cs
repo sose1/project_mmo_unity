@@ -17,7 +17,7 @@ namespace Network
     {
         private const string IP = "127.0.0.1";
         private const int SERVER_PORT = 5500;
-        private const int CLIENT_PORT = 5602;
+        private const int CLIENT_PORT = 0;
 
         public TMP_Text networkStatus;
         public GameObject localPlayerPrefab;
@@ -35,6 +35,8 @@ namespace Network
             var y = (Screen.height - 120) / 2;
             _windowRect = new Rect(x, y, 400, 120);
             _udpClient = new UdpClient(CLIENT_PORT);
+            Debug.Log("UDP port : " + ((IPEndPoint)_udpClient.Client.LocalEndPoint).Port.ToString());
+            
             try
             {
                 _udpClient.Connect(IP, SERVER_PORT);
@@ -148,7 +150,7 @@ namespace Network
             RestartLoop:
 
             var ping = new Ping(IP);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(3f);
             while (!ping.isDone) yield return null;
 
             networkStatus.text = $"SERVER: {ping.ip}, PING: {ping.time} ms";
