@@ -14,6 +14,5 @@ namespace Network.Models.ResponseEvent
     {
         public string userId;
         public Position position;
-        public string receivedTime;
     }
 }

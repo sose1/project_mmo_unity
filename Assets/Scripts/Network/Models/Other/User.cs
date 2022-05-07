@@ -8,6 +8,7 @@ namespace Network.Models.Other
     {
         public string _id;
         public string email;
+        public string nickname;
         public bool isLogged;
         [CanBeNull] public Position position;
     }
