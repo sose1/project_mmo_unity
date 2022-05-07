@@ -238,8 +238,8 @@ namespace Network
         private void OnUserDisconnected(string message)
         {
             var userDisconnected = JsonUtility.FromJson<UserDisconnectedEvent>(message);
-            Debug.LogError(userDisconnected.data.user.email);
-            //Todo iusuwanie gracza
+            var remoteUserId = userDisconnected.data.user._id;
+            Destroy(GameObject.Find(remoteUserId));
         }
 
         private void OnOtherPlayerMove(string message)
