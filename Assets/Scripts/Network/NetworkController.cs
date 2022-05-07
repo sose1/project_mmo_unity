@@ -81,7 +81,7 @@ namespace Network
         private static byte[] GetConnectEventMessage()
         {
             var jwtApi = PlayerPrefs.GetString("AuthTokenAPI");
-            var message = Encoding.ASCII.GetBytes(
+            var message = Encoding.UTF8.GetBytes(
                 JsonUtility.ToJson(
                     new ConnectEvent
                     {
@@ -100,7 +100,7 @@ namespace Network
         {
             var jwtApi = "Bearer " + PlayerPrefs.GetString("AuthTokenAPI");
             var jwtServer = "Bearer " + PlayerPrefs.GetString("AuthTokenServer");
-            var message = Encoding.ASCII.GetBytes(
+            var message = Encoding.UTF8.GetBytes(
                 JsonUtility.ToJson(
                     new DisconnectEvent
                     {
@@ -121,7 +121,13 @@ namespace Network
 
         private void SendUserMoveEvent(Vector3 transformPosition)
         {
-            var message = Encoding.ASCII.GetBytes(
+            var position = new Position
+            {
+                x = transformPosition.x,
+                y = transformPosition.y,
+                z = transformPosition.z
+            };
+            var message = Encoding.UTF8.GetBytes(
                 JsonUtility.ToJson(
                     new UserMoveEvent
                     {
@@ -130,12 +136,7 @@ namespace Network
                         {
                             authorization = "Bearer " + PlayerPrefs.GetString("AuthTokenServer"),
                             userId = _userId,
-                            position = new Position
-                            {
-                                x = transformPosition.x,
-                                y = transformPosition.y,
-                                z = transformPosition.z
-                            }
+                            position = position
                         }
                     }
                 )
@@ -159,6 +160,7 @@ namespace Network
 
         private IEnumerator SendEvent(byte[] message)
         {
+            Debug.Log(Encoding.UTF8.GetString(message));
             yield return _udpClient.Send(message, message.Length);
         }
 
