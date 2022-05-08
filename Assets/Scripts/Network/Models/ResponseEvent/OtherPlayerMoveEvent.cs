@@ -4,15 +4,15 @@ using Network.Models.Other;
 namespace Network.Models.ResponseEvent
 {
     [Serializable]
-    public class OtherUserMoveEvent : NetworkEvent
+    public class OtherPlayerMoveEvent : NetworkEvent
     {
-        public OtherUserMoveData data;
+        public OtherPlayerMoveData data;
     }
 
     [Serializable]
-    public class OtherUserMoveData
+    public class OtherPlayerMoveData
     {
-        public string userId;
+        public string playerId;
         public Position position;
     }
 }

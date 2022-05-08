@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace Network.Models.Other
 {
     [Serializable]
-    public class User
+    public class Player
     {
         public string _id;
         public string email;

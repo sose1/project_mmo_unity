@@ -5,14 +5,14 @@ using Network.Models.Other;
 namespace Network.Models.ResponseEvent
 {
     [Serializable]
-    public class UserDisconnectedEvent: NetworkEvent
+    public class PlayerDisconnectedEvent: NetworkEvent
     {
-        public UserDisconnectedData data;
+        public PlayerDisconnectedData data;
     }
 
     [Serializable]
-    public class UserDisconnectedData
+    public class PlayerDisconnectedData
     {
-        public User user;
+        public Player player;
     }
 }

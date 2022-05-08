@@ -11,15 +11,14 @@ using Network.Models.RequestEvent;
 using Network.Models.ResponseEvent;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Network 
 {
     public class NetworkController : MonoBehaviour
     {
         private const string IP = "127.0.0.1";
-        private const int SERVER_PORT = 5500;
-        private const int CLIENT_PORT = 0;
+        private const int ServerPort = 5500;
+        private const int ClientPort = 0;
 
         public TMP_Text networkStatus;
         public GameObject localPlayerPrefab;
@@ -29,19 +28,19 @@ namespace Network
         private Rect _windowRect;
         private bool _isLoading = true;
         private bool _isConnected;
-        private string _userId;
+        private string _playerId;
 
         private void Start()
         {
             var x = (Screen.width - 400) / 2;
             var y = (Screen.height - 120) / 2;
             _windowRect = new Rect(x, y, 400, 120);
-            _udpClient = new UdpClient(CLIENT_PORT);
+            _udpClient = new UdpClient(ClientPort);
             Debug.Log("UDP port : " + ((IPEndPoint)_udpClient.Client.LocalEndPoint).Port.ToString());
             
             try
             {
-                _udpClient.Connect(IP, SERVER_PORT);
+                _udpClient.Connect(IP, ServerPort);
                 _udpClient.Client.ReceiveTimeout = 1000;
             }
             catch (Exception e)
@@ -57,7 +56,7 @@ namespace Network
         public void OnLocalPlayerMove(Vector3 position)
         {
             if (!_isConnected) return;
-            SendUserMoveEvent(position);
+            SendPlayerMoveEvent(position);
         }
 
         private void OnApplicationQuit()
@@ -111,7 +110,7 @@ namespace Network
                         {
                             authorization = jwtServer,
                             jwtApi = jwtApi,
-                            userId = _userId
+                            playerId = _playerId
                         }
                     }
                 )
@@ -121,7 +120,7 @@ namespace Network
             StopCoroutine(nameof(SendEvent));
         }
 
-        private void SendUserMoveEvent(Vector3 transformPosition)
+        private void SendPlayerMoveEvent(Vector3 transformPosition)
         {
             var position = new Position
             {
@@ -131,13 +130,13 @@ namespace Network
             };
             var message = Encoding.UTF8.GetBytes(
                 JsonUtility.ToJson(
-                    new UserMoveEvent
+                    new PlayerMoveEvent
                     {
-                        name = "user-move",
-                        data = new UserMoveData
+                        name = "player-move",
+                        data = new PlayerMoveData
                         {
                             authorization = "Bearer " + PlayerPrefs.GetString("AuthTokenServer"),
-                            userId = _userId,
+                            playerId = _playerId,
                             position = position
                         }
                     }
@@ -178,13 +177,13 @@ namespace Network
                         var receiveBytes = _udpClient.Receive(ref remoteEndPoint);
                         var receiveString = Encoding.UTF8.GetString(receiveBytes);
 
-                        if (receiveString.Contains("user-disconnected"))
-                            OnUserDisconnected(receiveString);
-                        else if (receiveString.Contains("user-connected"))
-                            OnUserConnected(receiveString);
+                        if (receiveString.Contains("player-disconnected"))
+                            OnPlayerDisconnected(receiveString);
+                        else if (receiveString.Contains("player-connected"))
+                            OnPlayerConnected(receiveString);
                         else if (receiveString.Contains("connected"))
                             OnConnected(receiveString);
-                        else if (receiveString.Contains("other-user-move"))
+                        else if (receiveString.Contains("other-player-move"))
                             OnOtherPlayerMove(receiveString);
 
                     }
@@ -204,21 +203,21 @@ namespace Network
             var connectedEvent = JsonUtility.FromJson<ConnectedEvent>(message);
             PlayerPrefs.SetString("AuthTokenServer", connectedEvent.data.jwtServer);
             Thread.Sleep(2000);
-            _userId = connectedEvent.data.user._id;
+            _playerId = connectedEvent.data.player._id;
             _isLoading = false;
             _isConnected = true;
 
             //Generate local player
-            var lastPosition = connectedEvent.data.user.position;
+            var lastPosition = connectedEvent.data.player.position;
             CreateLocalPlayer(lastPosition);
 
             //Generate RemotePlayer
-            var remotePlayers = connectedEvent.data.otherUsers;
+            var remotePlayers = connectedEvent.data.otherPlayers;
             if (remotePlayers != null && remotePlayers.Count > 0)
             {
                 foreach (var player in remotePlayers)
                 {
-                    if (player._id != _userId)
+                    if (player._id != _playerId)
                     {
                         CreateRemotePlayer(player.position, player);
                     }
@@ -227,30 +226,30 @@ namespace Network
         }
 
 
-        private void OnUserConnected(string receiveString)
+        private void OnPlayerConnected(string receiveString)
         {
-            var userConnectedEvent = JsonUtility.FromJson<UserConnectedEvent>(receiveString);
-            var lastPosition = userConnectedEvent.data.user.position;
+            var playerConnectedEvent = JsonUtility.FromJson<PlayerConnectedEvent>(receiveString);
+            var lastPosition = playerConnectedEvent.data.player.position;
 
-            if (userConnectedEvent.data.user._id != _userId)
+            if (playerConnectedEvent.data.player._id != _playerId)
             {
-                CreateRemotePlayer(lastPosition, userConnectedEvent.data.user);
+                CreateRemotePlayer(lastPosition, playerConnectedEvent.data.player);
             }
         }
 
-        private void OnUserDisconnected(string message)
+        private void OnPlayerDisconnected(string message)
         {
-            var userDisconnected = JsonUtility.FromJson<UserDisconnectedEvent>(message);
-            var remoteUserId = userDisconnected.data.user._id;
-            Destroy(GameObject.Find(remoteUserId));
+            var playerDisconnectedEvent = JsonUtility.FromJson<PlayerDisconnectedEvent>(message);
+            var remotePlayerId = playerDisconnectedEvent.data.player._id;
+            Destroy(GameObject.Find(remotePlayerId));
         }
 
         private void OnOtherPlayerMove(string message)
         {
-            var otherUserMoveEvent = JsonUtility.FromJson<OtherUserMoveEvent>(message);
-            var position = otherUserMoveEvent.data.position;
+            var otherPlayerMoveEvent = JsonUtility.FromJson<OtherPlayerMoveEvent>(message);
+            var position = otherPlayerMoveEvent.data.position;
             var vector = new Vector3(position.x, position.y, position.z);
-            GameObject.Find(otherUserMoveEvent.data.userId).GetComponent<RemotePlayerController>().Move(vector);
+            GameObject.Find(otherPlayerMoveEvent.data.playerId).GetComponent<RemotePlayerController>().Move(vector);
         }
 
         private void CreateLocalPlayer(Position position)
@@ -261,10 +260,10 @@ namespace Network
                     ? new Vector3(position.x, position.y, position.z)
                     : new Vector3(0, 0, 0),
                 Quaternion.identity
-            ).GetComponent<LocalPlayerController>().id = _userId;
+            ).GetComponent<LocalPlayerController>().id = _playerId;
         }
 
-        private void CreateRemotePlayer(Position position, User remoteUser)
+        private void CreateRemotePlayer(Position position, Player remotePlayer)
         {
             Instantiate(
                 remotePlayerPrefab,
@@ -272,12 +271,12 @@ namespace Network
                     ? new Vector3(position.x, position.y, position.z)
                     : new Vector3(0, 0, 0),
                 Quaternion.identity
-            ).name = remoteUser._id;
-            GameObject.Find(remoteUser._id).GetComponentInChildren<TextMeshPro>().text = remoteUser.nickname;
+            ).name = remotePlayer._id;
+            GameObject.Find(remotePlayer._id).GetComponentInChildren<TextMeshPro>().text = remotePlayer.nickname;
 
             var cameraRotation = FindObjectOfType<CinemachineFreeLook>().transform.position;
             var textRotation = Quaternion.Euler(cameraRotation.x, 0, cameraRotation.z);
-            GameObject.Find(remoteUser._id)
+            GameObject.Find(remotePlayer._id)
                 .GetComponentInChildren<TextMeshPro>()
                 .transform.rotation = textRotation;
         }
