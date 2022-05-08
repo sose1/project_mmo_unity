@@ -10,7 +10,7 @@ public class RemotePlayerController : MonoBehaviour
     public Vector3 velocity = Vector3.zero;
     private Vector3 _lastPosition;
     private Vector3 _endPosition;
-    private CinemachineFreeLook _camera; 
+
     void Start()
     {
         _lastPosition = transform.position;
@@ -18,7 +18,8 @@ public class RemotePlayerController : MonoBehaviour
 
     private void Update()
     {
-        RotateNickname(FindObjectOfType<CinemachineFreeLook>().transform.position);
+        if (Camera.main is { }) GetComponentInChildren<TextMeshPro>().transform.LookAt(Camera.main.transform);
+        GetComponentInChildren<TextMeshPro>().transform.Rotate(0, 180, 0);
     }
 
     private void FixedUpdate()
@@ -31,13 +32,5 @@ public class RemotePlayerController : MonoBehaviour
     {
         _endPosition = position;
         _lastPosition = transform.position;
-    }
-
-    private void RotateNickname(Vector3 cameraPosition)
-    {
-
-        var newPosition = Vector3.Scale(cameraPosition, new Vector3(-1f, 0, -1f));
-        GetComponentInChildren<TextMeshPro>().transform.LookAt(newPosition);
-       
     }
 }
