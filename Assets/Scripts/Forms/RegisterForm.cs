@@ -14,7 +14,7 @@ public class RegisterForm : MonoBehaviour
 
     public void onClickSubmit()
     {
-        StartCoroutine(RegisterUser(emailInput.text, passwordInput.text, nicknameInput.text));
+        StartCoroutine(RegisterPlayer(emailInput.text, passwordInput.text, nicknameInput.text));
     }
 
     public void onClickBack()
@@ -23,7 +23,7 @@ public class RegisterForm : MonoBehaviour
 
     }
 
-    private static IEnumerator RegisterUser(string email, string password, string nickname)
+    private static IEnumerator RegisterPlayer(string email, string password, string nickname)
     {
         var requestRaw =
             Encoding.UTF8.GetBytes(
@@ -31,7 +31,7 @@ public class RegisterForm : MonoBehaviour
                     new RegisterRequestModel {email = email, password = password, nickname = nickname}
                 )
             );
-        var request = WebRequestBuilder.GetInstance().Request("http://127.0.0.1:8080/api/v1/users", "POST", requestRaw);
+        var request = WebRequestBuilder.GetInstance().Request("http://127.0.0.1:8080/api/v1/players", "POST", requestRaw);
         yield return request.SendWebRequest();
 
         if (request.error != null)

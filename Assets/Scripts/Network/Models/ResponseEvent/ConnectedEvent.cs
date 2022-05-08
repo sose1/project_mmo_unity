@@ -16,7 +16,7 @@ namespace Network.Models.ResponseEvent
     public class ConnectedData
     {
         public string jwtServer;
-        public User user;
-        [CanBeNull] public List<User> otherUsers;
+        public Player player;
+        [CanBeNull] public List<Player> otherPlayers;
     }
 }

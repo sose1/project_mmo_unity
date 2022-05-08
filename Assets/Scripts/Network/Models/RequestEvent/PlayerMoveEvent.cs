@@ -4,16 +4,16 @@ using Network.Models.Other;
 namespace Network.Models.RequestEvent
 {
     [Serializable]
-    public class UserMoveEvent: NetworkEvent
+    public class PlayerMoveEvent: NetworkEvent
     {
-        public UserMoveData data;
+        public PlayerMoveData data;
     }
     
     [Serializable]
-    public class UserMoveData
+    public class PlayerMoveData
     {
         public string authorization;
-        public string userId;
+        public string playerId;
         public Position position;
     }
 }

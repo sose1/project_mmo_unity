@@ -32,7 +32,7 @@ public class LoginForm : MonoBehaviour
                 )
             );
         var request = WebRequestBuilder.GetInstance()
-            .Request("http://127.0.0.1:8080/api/v1/users/login", "POST", requestRaw);
+            .Request("http://127.0.0.1:8080/api/v1/players/login", "POST", requestRaw);
         yield return request.SendWebRequest();
 
         if (request.error != null)

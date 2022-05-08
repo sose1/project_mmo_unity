@@ -13,6 +13,6 @@ namespace Network.Models.RequestEvent
     {
         public string authorization;
         public string jwtApi;
-        public string userId;
+        public string playerId;
     }
 }
