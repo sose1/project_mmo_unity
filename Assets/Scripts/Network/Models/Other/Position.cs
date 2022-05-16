@@ -8,5 +8,6 @@ namespace Network.Models.Other
         public float x;
         public float y;
         public float z;
+        public float rotation;
     }
 }
