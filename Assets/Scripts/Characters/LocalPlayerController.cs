@@ -1,4 +1,3 @@
-using System;
 using Cinemachine;
 using Network;
 using Network.Models.Other;
@@ -14,7 +13,6 @@ namespace Characters
 
         public float playerSpeed = 10f;
         public float cameraSpeed = 2f;
-        public string id;
         public GameObject followTarget;
         private GameObject _networkControllerGameObject;
         private NetworkController _networkController;
@@ -23,7 +21,6 @@ namespace Characters
         
         private void Start()
         {
-            Debug.Log("TWorze gracza o ID: " + id);
             _networkControllerGameObject = GameObject.Find("NetworkController");
             _networkController = _networkControllerGameObject.GetComponent<NetworkController>();
             FindObjectOfType<CinemachineVirtualCamera>().GetComponent<FollowPlayer>().Follow();
@@ -45,7 +42,7 @@ namespace Characters
 
             var position = new Position
             {
-                rotation = transform.rotation.y,
+                rotation = transform.eulerAngles.y,
                 x = position1.x,
                 y = position1.y,
                 z = position1.z

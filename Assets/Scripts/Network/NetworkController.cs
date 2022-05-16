@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using Characters;
 using Cinemachine;
 using Network.Models.Other;
 using Network.Models.RequestEvent;
@@ -122,7 +121,8 @@ namespace Network
 
         private void SendPlayerMoveEvent(Position transformPosition)
         {
-         
+            networkStatus.text = $"Rotation: {transformPosition.rotation}";
+
             var message = Encoding.UTF8.GetBytes(
                 JsonUtility.ToJson(
                     new PlayerMoveEvent
@@ -150,7 +150,7 @@ namespace Network
             yield return new WaitForSeconds(3f);
             while (!ping.isDone) yield return null;
 
-            networkStatus.text = $"SERVER: {ping.ip}, PING: {ping.time} ms";
+            // networkStatus.text = $"SERVER: {ping.ip}, PING: {ping.time} ms";
             goto RestartLoop;
         }
 
@@ -243,8 +243,7 @@ namespace Network
         {
             var otherPlayerMoveEvent = JsonUtility.FromJson<OtherPlayerMoveEvent>(message);
             var position = otherPlayerMoveEvent.data.position;
-            var vector = new Vector3(position.x, position.y, position.z);
-            GameObject.Find(otherPlayerMoveEvent.data.playerId).GetComponent<RemotePlayerController>().Move(vector);
+            GameObject.Find(otherPlayerMoveEvent.data.playerId).GetComponent<RemotePlayerController>().Move(position);
         }
 
         private void CreateLocalPlayer(Position position)
@@ -265,11 +264,11 @@ namespace Network
                 position != null
                     ? new Vector3(position.x, position.y, position.z)
                     : new Vector3(0, 0, 0),
-                Quaternion.Euler(0, position.rotation, 0)
+                Quaternion.Euler(new Vector3(0f, position.rotation, 0f))
             ).name = remotePlayer._id;
             GameObject.Find(remotePlayer._id).GetComponentInChildren<TextMeshPro>().text = remotePlayer.nickname;
 
-            var cameraRotation = FindObjectOfType<CinemachineFreeLook>().transform.position;
+            var cameraRotation = FindObjectOfType<CinemachineVirtualCamera>().transform.position;
             var textRotation = Quaternion.Euler(cameraRotation.x, 0, cameraRotation.z);
             GameObject.Find(remotePlayer._id)
                 .GetComponentInChildren<TextMeshPro>()
