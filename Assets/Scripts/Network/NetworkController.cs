@@ -12,7 +12,7 @@ using Network.Models.ResponseEvent;
 using TMPro;
 using UnityEngine;
 
-namespace Network 
+namespace Network
 {
     public class NetworkController : MonoBehaviour
     {
@@ -36,8 +36,8 @@ namespace Network
             var y = (Screen.height - 120) / 2;
             _windowRect = new Rect(x, y, 400, 120);
             _udpClient = new UdpClient(ClientPort);
-            Debug.Log("UDP port : " + ((IPEndPoint)_udpClient.Client.LocalEndPoint).Port.ToString());
-            
+            Debug.Log("UDP port : " + ((IPEndPoint) _udpClient.Client.LocalEndPoint).Port.ToString());
+
             try
             {
                 _udpClient.Connect(IP, ServerPort);
@@ -53,7 +53,7 @@ namespace Network
             StartCoroutine(SendEvent(GetConnectEventMessage()));
         }
 
-        public void OnLocalPlayerMove(Vector3 position)
+        public void OnLocalPlayerMove(Position position)
         {
             if (!_isConnected) return;
             SendPlayerMoveEvent(position);
@@ -120,14 +120,9 @@ namespace Network
             StopCoroutine(nameof(SendEvent));
         }
 
-        private void SendPlayerMoveEvent(Vector3 transformPosition)
+        private void SendPlayerMoveEvent(Position transformPosition)
         {
-            var position = new Position
-            {
-                x = transformPosition.x,
-                y = transformPosition.y,
-                z = transformPosition.z
-            };
+         
             var message = Encoding.UTF8.GetBytes(
                 JsonUtility.ToJson(
                     new PlayerMoveEvent
@@ -137,7 +132,7 @@ namespace Network
                         {
                             authorization = "Bearer " + PlayerPrefs.GetString("AuthTokenServer"),
                             playerId = _playerId,
-                            position = position
+                            position = transformPosition
                         }
                     }
                 )
@@ -259,8 +254,8 @@ namespace Network
                 position != null
                     ? new Vector3(position.x, position.y, position.z)
                     : new Vector3(0, 0, 0),
-                Quaternion.identity
-            ).GetComponent<LocalPlayerController>().id = _playerId;
+                Quaternion.Euler(0, position.rotation, 0)
+            );
         }
 
         private void CreateRemotePlayer(Position position, Player remotePlayer)
@@ -270,7 +265,7 @@ namespace Network
                 position != null
                     ? new Vector3(position.x, position.y, position.z)
                     : new Vector3(0, 0, 0),
-                Quaternion.identity
+                Quaternion.Euler(0, position.rotation, 0)
             ).name = remotePlayer._id;
             GameObject.Find(remotePlayer._id).GetComponentInChildren<TextMeshPro>().text = remotePlayer.nickname;
 
