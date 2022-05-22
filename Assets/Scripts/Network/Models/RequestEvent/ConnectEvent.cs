@@ -12,5 +12,6 @@ namespace Network.Models.RequestEvent
     public class ConnectData
     {
         public string jwtApi;
+        public string characterId;
     }
 }
