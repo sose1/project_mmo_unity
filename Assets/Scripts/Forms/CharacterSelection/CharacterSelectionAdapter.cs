@@ -1,44 +1,46 @@
 ﻿using System;
 using System.Collections;
-using System.Text;
 using Network;
 using UnityEngine;
 
 namespace Forms.CharacterSelection
 {
-    public class ListController : MonoBehaviour
+    public class CharacterSelectionAdapter : MonoBehaviour
     {
         public GameObject contentPanel;
         public GameObject characterItemPrefab;
         public string ownerId;
+
         private void Start()
         {
             ownerId = StaticAccountId.AccountId;
-            StartCoroutine(GetAllCharacters(DisplayerCharacteres));
+            StartCoroutine(GetAllCharacters(DisplayCharacteres));
         }
 
-        private void DisplayerCharacteres(Character[] characters)
+        private void DisplayCharacteres(Character[] characters)
         {
+            DestroyAllCharacters();
             if (characters.Length <= 0) return;
             foreach (var character in characters)
             {
                 var newCharacter = Instantiate(characterItemPrefab, contentPanel.transform, true);
-                var controller = newCharacter.GetComponent<CharacterSelectionItemController>();
+                var controller = newCharacter.GetComponent<CharacterSelectionItem>();
                 controller.Nickname = character.nickname;
                 controller.CharacterId = character._id;
                 newCharacter.transform.localScale = Vector3.one;
             }
         }
-       private void DestroyAllCharacters()
+
+        private void DestroyAllCharacters()
         {
-            var gameObjects = GameObject.FindGameObjectsWithTag ("CharacterSelectionItem");
-     
-            for(var i = 0 ; i < gameObjects.Length ; i ++)
+            var gameObjects = GameObject.FindGameObjectsWithTag("CharacterSelectionItem");
+
+            for (var i = 0; i < gameObjects.Length; i++)
             {
                 Destroy(gameObjects[i]);
             }
         }
-       
+
         private IEnumerator GetAllCharacters(Action<Character[]> characters)
         {
             var request = WebRequestBuilder.GetInstance()
@@ -57,13 +59,29 @@ namespace Forms.CharacterSelection
                 characters(x.response);
 
             }
+
             yield return new WaitForSeconds(1);
         }
 
         public void OnCharacterDelete()
         {
             DestroyAllCharacters();
-            StartCoroutine(GetAllCharacters(DisplayerCharacteres));
+            StartCoroutine(GetAllCharacters(DisplayCharacteres));
         }
+    }
+    
+    [Serializable]
+    public class Character
+    {
+        public string _id;
+        public string nickname;
+        public string owner;
+        public string __v;
+    }
+
+    [Serializable]
+    public class Characters
+    {
+        public Character[] response;
     }
 }

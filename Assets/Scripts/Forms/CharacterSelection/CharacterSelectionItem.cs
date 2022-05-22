@@ -2,10 +2,11 @@
 using Network;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Forms.CharacterSelection
 {
-    public class CharacterSelectionItemController: MonoBehaviour
+    public class CharacterSelectionItem: MonoBehaviour
     {
         public TMP_Text NicknameText;
         public string Nickname;
@@ -17,13 +18,12 @@ namespace Forms.CharacterSelection
 
         public void OnDeleteClick()
         {
-            Debug.Log($"Usuwam {Nickname}, OwnerID: {StaticAccountId.AccountId}");
             StartCoroutine(DeleteCharacter());
         }
 
         public void OnPlayClick()
         {
-            Debug.Log($"Gram {Nickname}");
+            SceneManager.LoadScene("GameScene");
         }
 
         private IEnumerator DeleteCharacter()
@@ -40,7 +40,7 @@ namespace Forms.CharacterSelection
             else
             {
                 Debug.Log("StatusCode: " + request.responseCode + "\nBody: " + request.downloadHandler.text);
-                GetComponentInParent<ListController>().OnCharacterDelete();
+                GetComponentInParent<CharacterSelectionAdapter>().OnCharacterDelete();
             }
 
             yield return 0;

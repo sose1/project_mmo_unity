@@ -1,5 +1,4 @@
-﻿using Network.Models.Other;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Networking;
 
 namespace Network
