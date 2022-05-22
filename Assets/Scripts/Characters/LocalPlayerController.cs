@@ -18,7 +18,9 @@ namespace Characters
         private NetworkController _networkController;
         private Vector3 _lastPosition;
         private float _sendTimer = 0f;
-        
+        private Vector3 gravityMove;
+        private bool isGrounded;
+
         private void Start()
         {
             _networkControllerGameObject = GameObject.Find("NetworkController");
@@ -28,11 +30,18 @@ namespace Characters
 
         private void Update()
         {
+            if (!characterController.isGrounded)
+                gravityMove.y += Physics.gravity.y * Time.deltaTime * 0.06f;
+            else
+                gravityMove.y = 0f;
+            
             RotateCamera();
         }
 
         private void FixedUpdate()
-        {           
+        {
+            
+
             Move();
 
             if (_lastPosition == transform.position) return;
@@ -69,9 +78,9 @@ namespace Characters
             }
 
             var move = transform.forward * verticalMove + transform.right * horizontalMove;
-            characterController.Move(playerSpeed * Time.deltaTime * move);
+            characterController.Move(playerSpeed * Time.deltaTime * move + gravityMove);
         }
-     
+        
         private void RotateCamera()
         {
             var mouseX = cameraSpeed * Input.GetAxis("Mouse X");

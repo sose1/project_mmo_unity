@@ -250,8 +250,8 @@ namespace Network
             Instantiate(
                 localPlayerPrefab,
                 position != null
-                    ? new Vector3(position.x, position.y, position.z)
-                    : new Vector3(0, 0, 0),
+                    ? new Vector3(position.x, position.y + 2, position.z)
+                    : new Vector3(0, 5, 0),
                 Quaternion.Euler(0, position.rotation, 0)
             );
         }
