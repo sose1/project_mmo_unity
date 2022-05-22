@@ -31,7 +31,7 @@ public class RegisterForm : MonoBehaviour
                     new RegisterRequestModel {email = email, password = password, nickname = nickname}
                 )
             );
-        var request = WebRequestBuilder.GetInstance().Request("http://127.0.0.1:8080/api/v1/players", "POST", requestRaw);
+        var request = WebRequestBuilder.GetInstance().Request("http://127.0.0.1:8080/api/v1/accounts", "POST", requestRaw);
         yield return request.SendWebRequest();
 
         if (request.error != null)

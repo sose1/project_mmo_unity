@@ -32,7 +32,7 @@ public class LoginForm : MonoBehaviour
                 )
             );
         var request = WebRequestBuilder.GetInstance()
-            .Request("http://127.0.0.1:8080/api/v1/players/login", "POST", requestRaw);
+            .Request("http://127.0.0.1:8080/api/v1/accounts/login", "POST", requestRaw);
         yield return request.SendWebRequest();
 
         if (request.error != null)
@@ -51,7 +51,7 @@ public class LoginForm : MonoBehaviour
             if (request.responseCode != 200) yield break;
             
             PlayerPrefs.SetString("AuthTokenAPI", request.downloadHandler.text);
-            SceneManager.LoadScene("GameScene");
+            SceneManager.LoadScene("CharacterSelectionScene");
         }
 
         yield return new WaitForSeconds(3);
