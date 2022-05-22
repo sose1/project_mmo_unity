@@ -260,10 +260,8 @@ namespace Network
         {
             Instantiate(
                 remotePlayerPrefab,
-                position != null
-                    ? new Vector3(position.x, position.y, position.z)
-                    : new Vector3(0, 0, 0),
-                Quaternion.Euler(new Vector3(0f, position.rotation, 0f))
+                new Vector3(position.x, position.y, position.z),
+                Quaternion.identity
             ).name = remotePlayer._id;
             GameObject.Find(remotePlayer._id).GetComponentInChildren<TextMeshPro>().text = remotePlayer.nickname;
 
