@@ -226,8 +226,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc75ed6d3e814ee79ab5e957d8e06d43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ContentPanel: {fileID: 237072380}
-  CharacterItemPrefab: {fileID: 1778830984437505025, guid: f9c4e86821d37144e9649cbaba950fd0, type: 3}
+  contentPanel: {fileID: 237072380}
+  characterItemPrefab: {fileID: 1778830984437505025, guid: f9c4e86821d37144e9649cbaba950fd0, type: 3}
+  ownerId: 
 --- !u!1 &237072380
 GameObject:
   m_ObjectHideFlags: 0

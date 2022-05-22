@@ -1,4 +1,6 @@
-﻿using UnityEngine.Networking;
+﻿using Network.Models.Other;
+using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Network
 {
@@ -32,7 +34,7 @@ namespace Network
                 downloadHandler = new DownloadHandlerBuffer()
             };
             request.SetRequestHeader("Content-Type", "application/json");
-
+            request.SetRequestHeader("Authorization", "Bearer " + PlayerPrefs.GetString("AuthTokenAPI"));
             return request;
         }
     }

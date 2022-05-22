@@ -49,8 +49,9 @@ public class LoginForm : MonoBehaviour
         {
             Debug.Log("StatusCode: " + request.responseCode + "\nBody: " + request.downloadHandler.text);
             if (request.responseCode != 200) yield break;
-            
-            PlayerPrefs.SetString("AuthTokenAPI", request.downloadHandler.text);
+            var res = JsonUtility.FromJson<Response>(request.downloadHandler.text);
+            PlayerPrefs.SetString("AuthTokenAPI", res.accessToken);
+            StaticAccountId.AccountId = res.account._id;
             SceneManager.LoadScene("CharacterSelectionScene");
         }
 
@@ -64,4 +65,17 @@ public class LoginRequestModel
 {
     public string email;
     public string password;
+}
+
+[Serializable]
+public class Response
+{
+    public string accessToken;
+    public Account account;
+}
+
+[Serializable]
+public class Account
+{
+    public string _id;
 }
