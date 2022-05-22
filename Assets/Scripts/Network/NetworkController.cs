@@ -88,7 +88,8 @@ namespace Network
                         name = "connect",
                         data = new ConnectData
                         {
-                            jwtApi = "Bearer " + jwtApi
+                            jwtApi = "Bearer " + jwtApi,
+                            characterId = StaticCharacterId.CharacterId
                         }
                     }
                 )
@@ -187,7 +188,6 @@ namespace Network
                 {
                     Debug.LogError(e);
                 }
-
                 yield return null;
             }
         }

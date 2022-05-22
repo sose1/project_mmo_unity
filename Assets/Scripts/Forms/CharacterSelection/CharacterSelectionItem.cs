@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Network;
+using Network.Models.Other;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -22,7 +23,8 @@ namespace Forms.CharacterSelection
         }
 
         public void OnPlayClick()
-        {
+        {            
+            StaticCharacterId.CharacterId = CharacterId;
             SceneManager.LoadScene("GameScene");
         }
 
