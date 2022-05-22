@@ -151,7 +151,7 @@ namespace Network
             yield return new WaitForSeconds(3f);
             while (!ping.isDone) yield return null;
 
-            // networkStatus.text = $"SERVER: {ping.ip}, PING: {ping.time} ms";
+            networkStatus.text = $"SERVER: {ping.ip}, PING: {ping.time} ms";
             goto RestartLoop;
         }
 
@@ -172,7 +172,6 @@ namespace Network
 
                         var receiveBytes = _udpClient.Receive(ref remoteEndPoint);
                         var receiveString = Encoding.UTF8.GetString(receiveBytes);
-
                         if (receiveString.Contains("player-disconnected"))
                             OnPlayerDisconnected(receiveString);
                         else if (receiveString.Contains("player-connected"))
