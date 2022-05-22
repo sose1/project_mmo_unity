@@ -46,7 +46,7 @@ GameObject:
   - component: {fileID: 7570364429605320065}
   m_Layer: 0
   m_Name: LocalPlayer
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -59,7 +59,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4258934986344228049}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 16.26559, y: 4.6103954, z: 42.14823}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1513266432353910477}
@@ -123,7 +123,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4258934986344228049}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: eb66e6bc5517a114f8fff9468a95bb39, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -144,7 +144,6 @@ MonoBehaviour:
   characterController: {fileID: 7570364429605320065}
   playerSpeed: 10
   cameraSpeed: 2
-  id: 
   followTarget: {fileID: 167065346936503474}
 --- !u!143 &7570364429605320065
 CharacterController:
