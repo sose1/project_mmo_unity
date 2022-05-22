@@ -15,6 +15,12 @@ EditorBuildSettings:
     path: Assets/Scenes/RegisterScene.unity
     guid: d188850231a595245bff450319f0ff60
   - enabled: 1
+    path: Assets/Scenes/CharacterSelectionScene.unity
+    guid: adeb1dfc927a6cc499d65451016ff0b8
+  - enabled: 1
     path: Assets/Scenes/GameScene.unity
     guid: e813acebb0274a8498bc5b57f2a765eb
+  - enabled: 1
+    path: Assets/Scenes/CharacterCreatorScene.unity
+    guid: 10fa094fd27513a4a91b403baa26f75a
   m_configObjects: {}

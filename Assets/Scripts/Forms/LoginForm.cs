@@ -32,7 +32,7 @@ public class LoginForm : MonoBehaviour
                 )
             );
         var request = WebRequestBuilder.GetInstance()
-            .Request("http://127.0.0.1:8080/api/v1/players/login", "POST", requestRaw);
+            .Request("http://127.0.0.1:8080/api/v1/accounts/login", "POST", requestRaw);
         yield return request.SendWebRequest();
 
         if (request.error != null)
@@ -49,9 +49,10 @@ public class LoginForm : MonoBehaviour
         {
             Debug.Log("StatusCode: " + request.responseCode + "\nBody: " + request.downloadHandler.text);
             if (request.responseCode != 200) yield break;
-            
-            PlayerPrefs.SetString("AuthTokenAPI", request.downloadHandler.text);
-            SceneManager.LoadScene("GameScene");
+            var res = JsonUtility.FromJson<Response>(request.downloadHandler.text);
+            PlayerPrefs.SetString("AuthTokenAPI", res.accessToken);
+            StaticAccountId.AccountId = res.account._id;
+            SceneManager.LoadScene("CharacterSelectionScene");
         }
 
         yield return new WaitForSeconds(3);
@@ -64,4 +65,17 @@ public class LoginRequestModel
 {
     public string email;
     public string password;
+}
+
+[Serializable]
+public class Response
+{
+    public string accessToken;
+    public Account account;
+}
+
+[Serializable]
+public class Account
+{
+    public string _id;
 }
