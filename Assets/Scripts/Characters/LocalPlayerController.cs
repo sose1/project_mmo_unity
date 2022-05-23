@@ -14,13 +14,16 @@ namespace Characters
         public float playerSpeed = 10f;
         public float cameraSpeed = 2f;
         public GameObject followTarget;
+        public string animationState = "IDLE";
+
         private GameObject _networkControllerGameObject;
         private NetworkController _networkController;
         private Vector3 _lastPosition;
         private float _sendTimer = 0f;
         private Vector3 gravityMove;
         private bool isGrounded;
-
+        private int idleCountSend = 0;
+        
         private void Start()
         {
             _networkControllerGameObject = GameObject.Find("NetworkController");
@@ -34,21 +37,14 @@ namespace Characters
                 gravityMove.y += Physics.gravity.y * Time.deltaTime * 0.06f;
             else
                 gravityMove.y = 0f;
-            
+
             RotateCamera();
         }
 
         private void FixedUpdate()
         {
-            
-
             Move();
-
-            if (_lastPosition == transform.position) return;
-
             var position1 = transform.position;
-            _lastPosition = position1;
-
             var position = new Position
             {
                 rotation = transform.eulerAngles.y,
@@ -56,9 +52,25 @@ namespace Characters
                 y = position1.y,
                 z = position1.z
             };
+            
+            if (_lastPosition == transform.position)
+            {
+                if (idleCountSend <= 5)
+                {
+                    if (idleCountSend == 5)
+                        idleCountSend = 5;
+                    Debug.Log($"DUPA");
+                    _networkController.OnLocalPlayerMove(position, animationState);
+                    idleCountSend++;   
+                }
+                return;
+            }
+
+            _lastPosition = position1;
+
             if (_sendTimer.Equals(1f))
             {
-                _networkController.OnLocalPlayerMove(position);
+                _networkController.OnLocalPlayerMove(position, animationState);
                 _sendTimer = 0f;
             }
             else
@@ -66,7 +78,7 @@ namespace Characters
                 _sendTimer++;
             }
         }
-        
+
         private void Move()
         {
             var horizontalMove = Input.GetAxis("Horizontal");
@@ -74,13 +86,19 @@ namespace Characters
 
             if (verticalMove != 0f || horizontalMove != 0f)
             {
+                animationState = "RUN";
                 Rotate();
+                idleCountSend = 0;
+            }
+            else
+            {
+                animationState = "IDLE";
             }
 
             var move = transform.forward * verticalMove + transform.right * horizontalMove;
             characterController.Move(playerSpeed * Time.deltaTime * move + gravityMove);
         }
-        
+
         private void RotateCamera()
         {
             var mouseX = cameraSpeed * Input.GetAxis("Mouse X");

@@ -52,10 +52,10 @@ namespace Network
             StartCoroutine(SendEvent(GetConnectEventMessage()));
         }
 
-        public void OnLocalPlayerMove(Position position)
+        public void OnLocalPlayerMove(Position position, string animationState)
         {
             if (!_isConnected) return;
-            SendPlayerMoveEvent(position);
+            SendPlayerMoveEvent(position, animationState);
         }
 
         private void OnApplicationQuit()
@@ -120,7 +120,7 @@ namespace Network
             StopCoroutine(nameof(SendEvent));
         }
 
-        private void SendPlayerMoveEvent(Position transformPosition)
+        private void SendPlayerMoveEvent(Position transformPosition, string animationState)
         {
             networkStatus.text = $"Rotation: {transformPosition.rotation}";
 
@@ -133,7 +133,8 @@ namespace Network
                         {
                             authorization = "Bearer " + PlayerPrefs.GetString("AuthTokenServer"),
                             playerId = _playerId,
-                            position = transformPosition
+                            position = transformPosition,
+                            animationState = animationState
                         }
                     }
                 )
@@ -242,6 +243,7 @@ namespace Network
         {
             var otherPlayerMoveEvent = JsonUtility.FromJson<OtherPlayerMoveEvent>(message);
             var position = otherPlayerMoveEvent.data.position;
+            Debug.Log($"OTHER PLAYER STATE {otherPlayerMoveEvent.data.animationState}");
             GameObject.Find(otherPlayerMoveEvent.data.playerId).GetComponent<RemotePlayerController>().Move(position);
         }
 
