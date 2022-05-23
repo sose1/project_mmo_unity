@@ -59,7 +59,6 @@ namespace Characters
                 {
                     if (idleCountSend == 5)
                         idleCountSend = 5;
-                    Debug.Log($"DUPA");
                     _networkController.OnLocalPlayerMove(position, animationState);
                     idleCountSend++;   
                 }
