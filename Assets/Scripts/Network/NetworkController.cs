@@ -16,6 +16,8 @@ namespace Network
     public class NetworkController : MonoBehaviour
     {
         private const string IP = "127.0.0.1";
+        // private const string IP = "192.168.0.8";
+
         private const int ServerPort = 5500;
         private const int ClientPort = 0;
 
@@ -35,7 +37,7 @@ namespace Network
             var y = (Screen.height - 120) / 2;
             _windowRect = new Rect(x, y, 400, 120);
             _udpClient = new UdpClient(ClientPort);
-            Debug.Log("UDP port : " + ((IPEndPoint) _udpClient.Client.LocalEndPoint).Port.ToString());
+            Debug.Log("UDP port : " + ((IPEndPoint) _udpClient.Client.LocalEndPoint).Port);
 
             try
             {
@@ -243,8 +245,8 @@ namespace Network
         {
             var otherPlayerMoveEvent = JsonUtility.FromJson<OtherPlayerMoveEvent>(message);
             var position = otherPlayerMoveEvent.data.position;
-            Debug.Log($"OTHER PLAYER STATE {otherPlayerMoveEvent.data.animationState}");
-            GameObject.Find(otherPlayerMoveEvent.data.playerId).GetComponent<RemotePlayerController>().Move(position);
+            Debug.Log(otherPlayerMoveEvent.name);
+            GameObject.Find(otherPlayerMoveEvent.data.playerId).GetComponent<RemotePlayerController>().Move(position, otherPlayerMoveEvent.data.animationState);
         }
 
         private void CreateLocalPlayer(Position position)

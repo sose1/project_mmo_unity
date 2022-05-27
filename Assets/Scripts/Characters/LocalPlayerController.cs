@@ -23,12 +23,15 @@ namespace Characters
         private Vector3 gravityMove;
         private bool isGrounded;
         private int idleCountSend = 0;
-        
+        private Animator _animator;
+        private static readonly int IsRunning = Animator.StringToHash("isRunning");
+
         private void Start()
         {
             _networkControllerGameObject = GameObject.Find("NetworkController");
             _networkController = _networkControllerGameObject.GetComponent<NetworkController>();
             FindObjectOfType<CinemachineVirtualCamera>().GetComponent<FollowPlayer>().Follow();
+            _animator = GetComponent<Animator>();
         }
 
         private void Update()
@@ -66,8 +69,7 @@ namespace Characters
             }
 
             _lastPosition = position1;
-
-            if (_sendTimer.Equals(1f))
+            if (_sendTimer.Equals(0f))
             {
                 _networkController.OnLocalPlayerMove(position, animationState);
                 _sendTimer = 0f;
@@ -85,12 +87,14 @@ namespace Characters
 
             if (verticalMove != 0f || horizontalMove != 0f)
             {
+                _animator.SetBool(IsRunning, true);
                 animationState = "RUN";
                 Rotate();
                 idleCountSend = 0;
             }
             else
             {
+                _animator.SetBool(IsRunning, false);
                 animationState = "IDLE";
             }
 
