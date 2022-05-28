@@ -14,5 +14,6 @@ namespace Network.Models.ResponseEvent
     {
         public string playerId;
         public Position position;
+        public string animationState;
     }
 }

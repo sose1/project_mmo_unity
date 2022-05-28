@@ -361,8 +361,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   networkStatus: {fileID: 1972639519}
-  localPlayerPrefab: {fileID: 4258934986344228049, guid: db5fec4c087528847a1ce74c2bcce820, type: 3}
-  remotePlayerPrefab: {fileID: 675885469971514408, guid: d024b0aee37ffc94189cd21bec366e46, type: 3}
+  localPlayerPrefab: {fileID: 8904763815721000806, guid: 6c91608aff39e3e49a972812756a503a, type: 3}
+  remotePlayerPrefab: {fileID: 3780485413084077253, guid: a8067cf20744fdb47b9d4c0e6d89257c, type: 3}
 --- !u!1 &395646173
 GameObject:
   m_ObjectHideFlags: 0

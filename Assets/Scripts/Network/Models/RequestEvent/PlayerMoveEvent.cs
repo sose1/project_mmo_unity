@@ -15,5 +15,6 @@ namespace Network.Models.RequestEvent
         public string authorization;
         public string playerId;
         public Position position;
+        public string animationState;
     }
 }
